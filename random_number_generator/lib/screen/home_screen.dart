@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:random_number_generator/constant/color.dart';
+import 'dart:math';
+
+import 'package:random_number_generator/screen/setting_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,29 +25,51 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               /// 제목과 아이콘 버튼이 있는 곳
-              _Header(),
+              _Header(onPressed: onSettingButtonPressed),
 
               /// 숫자가 있는 곳
               _Body(numbers: numbers),
 
               /// 버튼이 있는 곳
-              _Footer(
-                onPressed: () {
-                  setState(() {
-                    numbers = [999,888,777];
-                  });
-                },
-              ),
+              _Footer(onPressed: generateRandomNumber),
             ],
           ),
         ),
       ),
     );
   }
+
+  generateRandomNumber() {
+    final rand = Random();
+
+    final Set<int> newNumbers = {};
+
+    while (newNumbers.length < 3) {
+      final randomNumber = rand.nextInt(1000);
+      newNumbers.add(randomNumber);
+    }
+
+    setState(() {
+      numbers = newNumbers.toList();
+    });
+  }
+
+  onSettingButtonPressed() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return SettingScreen();
+        },
+      ),
+    );
+  }
 }
 
+
 class _Header extends StatelessWidget {
-  const _Header({super.key});
+  final VoidCallback onPressed;
+
+  const _Header({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +84,7 @@ class _Header extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.settings),
-          color: redColor,
-        ),
+        IconButton(onPressed: onPressed, icon: Icon(Icons.settings),),
       ],
     );
   }
