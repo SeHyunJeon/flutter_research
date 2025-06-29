@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:random_number_generator/component/number_to_image.dart';
 import 'package:random_number_generator/constant/color.dart';
 import 'dart:math';
 
@@ -13,6 +14,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<int> numbers = [123, 456, 789];
+
+  int maxNumber = 1000;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final Set<int> newNumbers = {};
 
     while (newNumbers.length < 3) {
-      final randomNumber = rand.nextInt(1000);
+      final randomNumber = rand.nextInt(maxNumber);
       newNumbers.add(randomNumber);
     }
 
@@ -54,14 +57,16 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  onSettingButtonPressed() {
-    Navigator.of(context).push(
+  onSettingButtonPressed() async {
+    final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return SettingScreen();
+          return SettingScreen(maxNumber: maxNumber,);
         },
       ),
     );
+
+    maxNumber = result;
   }
 }
 
@@ -102,19 +107,7 @@ class _Body extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: numbers
             .map(
-              (e) => Row(
-                children: e
-                    .toString()
-                    .split('')
-                    .map(
-                      (number) => Image.asset(
-                        'asset/img/$number.png',
-                        width: 50.0,
-                        height: 70.0,
-                      ),
-                    )
-                    .toList(),
-              ),
+              (e) => NumberToImage(number: e),
             )
             .toList(),
       ),

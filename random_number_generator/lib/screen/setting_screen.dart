@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:random_number_generator/constant/color.dart';
+import 'package:random_number_generator/component/number_to_image.dart';
 
 class SettingScreen extends StatefulWidget {
-  const SettingScreen({super.key});
+  final int maxNumber;
+
+  const SettingScreen({required this.maxNumber, super.key});
 
   @override
   State<SettingScreen> createState() => _SettingScreenState();
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  final double maxNumber = 1000.0;
+  double maxNumber = 1000;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    maxNumber = widget.maxNumber.toDouble();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +31,25 @@ class _SettingScreenState extends State<SettingScreen> {
           padding: EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [_Number(maxNumber: maxNumber), _Slider(), _Button()],
+            children: [
+              _Number(maxNumber: maxNumber),
+              _Slider(value: maxNumber, onSliderChanged: onSliderChanged),
+              _Button(onPressed: onSavePressed),
+            ],
           ),
         ),
       ),
     );
+  }
+
+  onSavePressed() {
+    Navigator.of(context).pop(maxNumber.toInt());
+  }
+
+  onSliderChanged(double value) {
+    setState(() {
+      maxNumber = value;
+    });
   }
 }
 
@@ -36,36 +61,37 @@ class _Number extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Container(
-        child: Row(
-          children: maxNumber.toInt()
-              .toString()
-              .split('')
-              .map(
-                (number) => Image.asset(
-              'asset/img/$number.png',
-              width: 50.0,
-              height: 70.0,
-            ),
-          )
-              .toList(),
-        ),
-      ),
+      child: Container(child: NumberToImage(number: maxNumber.toInt())),
     );
   }
 }
 
 class _Slider extends StatelessWidget {
-  const _Slider({super.key});
+  final double value;
+  final ValueChanged<double> onSliderChanged;
+
+  const _Slider({
+    required this.value,
+    required this.onSliderChanged,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Slider(
+      value: value,
+      min: 1000,
+      max: 100000,
+      activeColor: redColor,
+      onChanged: onSliderChanged,
+    );
   }
 }
 
 class _Button extends StatelessWidget {
-  const _Button({super.key});
+  final VoidCallback onPressed;
+
+  const _Button({required this.onPressed, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +100,7 @@ class _Button extends StatelessWidget {
         backgroundColor: redColor,
         foregroundColor: Colors.white,
       ),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
+      onPressed: onPressed,
       child: Text('저장!'),
     );
   }
